@@ -448,9 +448,11 @@ class ChangePasswordView(FormView):
             "current_site": current_site,
         }
         ext = "txt" if settings.EMAIL_CONTENT_SUBTYPE == 'plain' else 'html'
-        subject = render_to_string("account/email/password_change_subject.{0}".format(ext), ctx)
+        subject = render_to_string(
+            "account/email/password_change_subject.{0}".format(ext), ctx)
         subject = "".join(subject.splitlines())
-        message = render_to_string("account/email/password_change.{0}".format(ext), ctx)
+        message = render_to_string(
+            "account/email/password_change.{0}".format(ext), ctx)
         msg = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
         msg.content_subtype = settings.EMAIL_CONTENT_SUBTYPE
         msg.send()
@@ -496,9 +498,11 @@ class PasswordResetView(FormView):
             }
             ext = "txt" if settings.EMAIL_CONTENT_SUBTYPE == 'plain' else 'html'
 
-            subject = render_to_string("account/email/password_reset_subject.{0}".format(ext), ctx)
+            subject = render_to_string(
+                "account/email/password_reset_subject.{0}".format(ext), ctx)
             subject = "".join(subject.splitlines())
-            message = render_to_string("account/email/password_reset.{0}".format(ext), ctx)
+            message = render_to_string(
+                "account/email/password_reset.{0}".format(ext), ctx)
             msg = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
             msg.content_subtype = settings.EMAIL_CONTENT_SUBTYPE
             msg.send()

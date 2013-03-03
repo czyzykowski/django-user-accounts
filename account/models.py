@@ -212,8 +212,10 @@ class SignupCode(models.Model):
             "signup_url": signup_url,
         }
         ext = "txt" if settings.EMAIL_CONTENT_SUBTYPE == 'plain' else 'html'
-        subject = render_to_string("account/email/invite_user_subject.{0}".format(ext), ctx)
-        message = render_to_string("account/email/invite_user.{0}".format(ext), ctx)
+        subject = render_to_string(
+            "account/email/invite_user_subject.{0}".format(ext), ctx)
+        message = render_to_string(
+            "account/email/invite_user.{0}".format(ext), ctx)
         msg = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email])
         msg.content_subtype = settings.EMAIL_CONTENT_SUBTYPE
         msg.send()
@@ -335,9 +337,11 @@ class EmailConfirmation(models.Model):
         }
         ext = "txt" if settings.EMAIL_CONTENT_SUBTYPE == 'plain' else 'html'
 
-        subject = render_to_string("account/email/email_confirmation_subject.{0}".format(ext), ctx)
+        subject = render_to_string(
+            "account/email/email_confirmation_subject.{0}".format(ext), ctx)
         subject = "".join(subject.splitlines())  # remove superfluous line breaks
-        message = render_to_string("account/email/email_confirmation_message.{0}".format(ext), ctx)
+        message = render_to_string(
+            "account/email/email_confirmation_message.{0}".format(ext), ctx)
         msg = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email_address.email])
         msg.content_subtype = settings.EMAIL_CONTENT_SUBTYPE
         msg.send()
