@@ -40,6 +40,7 @@ class AccountAppConf(AppConf):
     EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
     EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = "account_login"
     EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = None
+    EMAIL_CONTENT_SUBTYPE = "plain"
     SETTINGS_REDIRECT_URL = "account_settings"
     NOTIFY_ON_PASSWORD_CHANGE = True
     DELETION_MARK_CALLBACK = "account.callbacks.account_delete_mark"
