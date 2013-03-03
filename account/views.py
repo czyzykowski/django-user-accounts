@@ -1,5 +1,5 @@
 from django.http import Http404, HttpResponseForbidden
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.http import base36_to_int, int_to_base36
 from django.template.loader import render_to_string
@@ -447,10 +447,13 @@ class ChangePasswordView(FormView):
             "protocol": protocol,
             "current_site": current_site,
         }
-        subject = render_to_string("account/email/password_change_subject.txt", ctx)
+        ext = "txt" if settings.EMAIL_CONTENT_SUBTYPE == 'plain' else 'html'
+        subject = render_to_string("account/email/password_change_subject.{0}".format(ext), ctx)
         subject = "".join(subject.splitlines())
-        message = render_to_string("account/email/password_change.txt", ctx)
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+        message = render_to_string("account/email/password_change.{0}".format(ext), ctx)
+        msg = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+        msg.content_subtype = settings.EMAIL_CONTENT_SUBTYPE
+        msg.send()
 
 
 class PasswordResetView(FormView):
@@ -491,10 +494,14 @@ class PasswordResetView(FormView):
                 "current_site": current_site,
                 "password_reset_url": password_reset_url,
             }
-            subject = render_to_string("account/email/password_reset_subject.txt", ctx)
+            ext = "txt" if settings.EMAIL_CONTENT_SUBTYPE == 'plain' else 'html'
+
+            subject = render_to_string("account/email/password_reset_subject.{0}".format(ext), ctx)
             subject = "".join(subject.splitlines())
-            message = render_to_string("account/email/password_reset.txt", ctx)
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+            message = render_to_string("account/email/password_reset.{0}".format(ext), ctx)
+            msg = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+            msg.content_subtype = settings.EMAIL_CONTENT_SUBTYPE
+            msg.send()
     
     def make_token(self, user):
         return self.token_generator.make_token(user)
