@@ -447,14 +447,15 @@ class ChangePasswordView(FormView):
             "protocol": protocol,
             "current_site": current_site,
         }
-        ext = "txt" if settings.EMAIL_CONTENT_SUBTYPE == 'plain' else 'html'
+        ext = "html" if settings.EMAIL_CONTENT_HTML else "txt"
         subject = render_to_string(
             "account/email/password_change_subject.{0}".format(ext), ctx)
         subject = "".join(subject.splitlines())
         message = render_to_string(
             "account/email/password_change.{0}".format(ext), ctx)
         msg = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
-        msg.content_subtype = settings.EMAIL_CONTENT_SUBTYPE
+        if settings.EMAIL_CONTENT_HTML:
+            msg.content_subtype = "html"
         msg.send()
 
 
@@ -496,7 +497,7 @@ class PasswordResetView(FormView):
                 "current_site": current_site,
                 "password_reset_url": password_reset_url,
             }
-            ext = "txt" if settings.EMAIL_CONTENT_SUBTYPE == 'plain' else 'html'
+            ext = "html" if settings.EMAIL_CONTENT_HTML else "txt"
 
             subject = render_to_string(
                 "account/email/password_reset_subject.{0}".format(ext), ctx)
@@ -504,7 +505,8 @@ class PasswordResetView(FormView):
             message = render_to_string(
                 "account/email/password_reset.{0}".format(ext), ctx)
             msg = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
-            msg.content_subtype = settings.EMAIL_CONTENT_SUBTYPE
+            if settings.EMAIL_CONTENT_HTML:
+                msg.content_subtype = "html"
             msg.send()
     
     def make_token(self, user):
