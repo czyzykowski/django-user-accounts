@@ -2,7 +2,7 @@ import datetime
 import operator
 import urllib
 
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.core.urlresolvers import reverse
 from django.db import models, transaction
 from django.db.models import Q
@@ -211,9 +211,12 @@ class SignupCode(models.Model):
             "current_site": current_site,
             "signup_url": signup_url,
         }
-        subject = render_to_string("account/email/invite_user_subject.txt", ctx)
-        message = render_to_string("account/email/invite_user.txt", ctx)
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email])
+        ext = "txt" if settings.EMAIL_CONTENT_SUBTYPE == 'plain' else 'html'
+        subject = render_to_string("account/email/invite_user_subject.{0}".format(ext), ctx)
+        message = render_to_string("account/email/invite_user.{0}".format(ext), ctx)
+        msg = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email])
+        msg.content_subtype = settings.EMAIL_CONTENT_SUBTYPE
+        msg.send()
         self.sent = timezone.now()
         self.save()
         signup_code_sent.send(sender=SignupCode, signup_code=self)
@@ -330,10 +333,14 @@ class EmailConfirmation(models.Model):
             "current_site": current_site,
             "key": self.key,
         }
-        subject = render_to_string("account/email/email_confirmation_subject.txt", ctx)
-        subject = "".join(subject.splitlines()) # remove superfluous line breaks
-        message = render_to_string("account/email/email_confirmation_message.txt", ctx)
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email_address.email])
+        ext = "txt" if settings.EMAIL_CONTENT_SUBTYPE == 'plain' else 'html'
+
+        subject = render_to_string("account/email/email_confirmation_subject.{0}".format(ext), ctx)
+        subject = "".join(subject.splitlines())  # remove superfluous line breaks
+        message = render_to_string("account/email/email_confirmation_message.{0}".format(ext), ctx)
+        msg = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [self.email_address.email])
+        msg.content_subtype = settings.EMAIL_CONTENT_SUBTYPE
+        msg.send()
         self.sent = timezone.now()
         self.save()
         signals.email_confirmation_sent.send(sender=self.__class__, confirmation=self)
